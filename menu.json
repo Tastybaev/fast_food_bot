@@ -1,0 +1,15 @@
+[{
+    "id": "1",
+    "name": "роллы",
+    "price": 2300,
+    "description": "рыба, рис, сыр сливочный",
+    "avaliable": "True"
+},
+
+{
+    "id": "2",
+    "name": "шашлык из баранины",
+    "price": 3800,
+    "description": "баранина, специи",
+    "avaliable": "True"
+}]

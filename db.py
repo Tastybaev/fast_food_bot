@@ -20,3 +20,8 @@ def get_or_create_user(db, effective_user, chat_id):
         }
         db.users.insert_one(user)
     return user
+
+
+def get_menu(db):
+    menu = db.menu.find({id: "1"})
+    return menu
