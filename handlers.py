@@ -1,5 +1,3 @@
-from curses import keyname
-from settings import TELEGRAM_CHAT_ID
 from db import db, get_or_create_user, get_menu
 from utils import main_keyboard
 
@@ -13,10 +11,14 @@ def start_message(update, context):
 
 def menu_message(update, context):
     menu = get_menu(db)
-    update.message.reply_text(
-        f"Мы предлагаем вам...\n{menu}",
+    text_menu = ''
+    for i in menu:
+        text_menu += f"Название: {i['name']}\nЦена: {i['price']}\nОписание: {i['description']}\n\n\n"
+    update.message.reply_text(      
+        f"Мы предлагаем вам:\n{text_menu}\nДля заказа нажмите 'Заказать'",
         reply_markup = main_keyboard()
     )
+    
 
 # def answer(update, context):
 #     chat = update.effective_chat

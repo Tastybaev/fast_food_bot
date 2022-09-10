@@ -23,5 +23,5 @@ def get_or_create_user(db, effective_user, chat_id):
 
 
 def get_menu(db):
-    menu = db.menu.find({id: "1"})
+    menu = db.menu.find()
     return menu
