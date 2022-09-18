@@ -13,7 +13,7 @@ def menu_message(update, context):
     menu = get_menu(db)
     text_menu = ''
     for i in menu:
-        text_menu += f"Название: {i['name']}\nЦена: {i['price']}\nОписание: {i['description']}\n\n\n"
+        text_menu += f"НОМЕР БЛЮДА: {i['id']}\nНазвание: {i['name']}\nЦена: {i['price']}\nОписание: {i['description']}\n\n\n"
     update.message.reply_text(      
         f"Мы предлагаем вам:\n{text_menu}\nДля заказа нажмите 'Заказать'",
         reply_markup = main_keyboard()
