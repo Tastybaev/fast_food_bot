@@ -10,7 +10,6 @@ from telegram.ext import (
 from handlers import menu_message, start_message
 from order import (
     order_adress,
-    order_adress_check,
     order_complete,
     order_name,
     order_payment,
@@ -32,7 +31,6 @@ def main():
             'name': [MessageHandler(Filters.text, order_name)],
             'count_of_portions': [MessageHandler(Filters.text, order_portion)],
             'adress': [MessageHandler(Filters.text, order_adress)],
-            'adress_check': [MessageHandler(Filters.text, order_adress_check)],
             'payment': [MessageHandler(Filters.text, order_payment)],
             'complete': [MessageHandler(Filters.text, order_complete)]
         },

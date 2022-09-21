@@ -43,7 +43,7 @@ def order_portion(update, context):
             return 'name'
     else:
         update.message.reply_text(
-                'Вы отмеинили заказ',
+                'Вы отменили заказ',
                 reply_markup=main_keyboard()
             )
         return ConversationHandler.END
@@ -51,32 +51,30 @@ def order_portion(update, context):
 
 def order_adress(update, context):
     if update.message.text != 'Отменить':
+        coords = update.message.location
         update.message.reply_text(
-            'Укажите адрес доставки',
-            reply_markup=ReplyKeyboardMarkup([['Передать координаты'], ['Отменить']])
+            f'Ваши адрес {coords}?\nЕсли нет, впишите адрес доставки',
+            reply_markup=ReplyKeyboardMarkup([['Да'], ['Отменить']])
         )
-        return 'adress_check'
+        return 'payment'
     else:
         update.message.reply_text(
-                'Вы отмеинили заказ',
+                'Вы отменили заказ',
                 reply_markup=main_keyboard()
             )
         return ConversationHandler.END
 
 
-def order_adress_check(update, context):
-    if update.message.text != 'Передать координаты':
-        coords = update.message.location
-        update.message.reply_text(
-            f'Ваши координаты {coords}?',
-            reply_markup=ReplyKeyboardMarkup([['Да'], ['Нет']])
-        )
-        return 'payment'
-
-
 def order_payment(update, context):
-    update.message.reply_text('Произведите оплату')
-    return 'complete'
+    if update.message.text != 'Отменить':
+        update.message.reply_text('Произведите оплату')
+        return 'complete'
+    else:
+        update.message.reply_text(
+                'Вы отменили заказ',
+                reply_markup=main_keyboard()
+            )
+        return ConversationHandler.END
 
 
 def order_complete(update, context):
