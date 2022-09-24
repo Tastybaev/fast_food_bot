@@ -1,6 +1,7 @@
 from db import db, get_or_create_user, get_menu
 from utils import main_keyboard
 
+
 def start_message(update, context):
     user = get_or_create_user(db, update.effective_user, update.message.chat_id)
     update.message.reply_text(

@@ -1,5 +1,3 @@
-from tracemalloc import Filter
-from unicodedata import name
 from telegram.ext import (
     CommandHandler,
     Filters,

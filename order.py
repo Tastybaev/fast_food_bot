@@ -15,7 +15,7 @@ def order_start(update, context):
 def order_name(update, context):
     if update.message.text == 'Заказать':
         update.message.reply_text(
-            'Впишите номер выбранного блюда',
+            'Впишите номера выбранных блюд, через запятую',
             reply_markup=ReplyKeyboardMarkup([
                 ['Отменить']
             ])
@@ -30,6 +30,9 @@ def order_name(update, context):
 
 def order_portion(update, context):
     if update.message.text != 'Отменить':
+        meal_id = update.message.text
+        context.user_data['order'] = {'meal_ids': meal_id}
+        print(context.user_data)
         menu = get_menu(db)
         for i in menu:
             if update.message.text == i['id']:
@@ -79,7 +82,7 @@ def order_payment(update, context):
 
 def order_complete(update, context):
     update.message.reply_text(
-        'Заказ принят',
+        'Спасибо, ваш заказ принят',
         reply_markup=main_keyboard()
     )
     return ConversationHandler.END

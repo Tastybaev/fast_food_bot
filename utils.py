@@ -9,6 +9,5 @@ def order_keyboard():
 
 def main_keyboard():
     return ReplyKeyboardMarkup([
-        ["Start"],
-        ["Указать адрес доставки", "Меню", "Заказать"]
+        ["Меню", "Заказать"]
     ])
