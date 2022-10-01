@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "name": "Шашлык из баранины",
+        "price": 3800,
+        "description": "250гр",
+        "avaliable": "True"
+    },
+    {
+        "id": "2",
+        "name": "Стейк рибай",
+        "price": 3500,
+        "description": "250гр",
+        "avaliable": "True"
+    },
+    {
+        "id": "3",
+        "name": "Плов",
+        "price": 2000,
+        "description": "300гр",
+        "avaliable": "True"
+    }
+]

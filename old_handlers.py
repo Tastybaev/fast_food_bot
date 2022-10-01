@@ -1,4 +1,4 @@
-from db import db, get_or_create_user, get_menu
+from db import db, get_menu_hot_dishes, get_or_create_user
 from utils import main_keyboard
 
 
@@ -11,7 +11,7 @@ def start_message(update, context):
 
 
 def menu_message(update, context):
-    menu = get_menu(db)
+    menu = get_menu_hot_dishes(db)
     text_menu = ''
     for i in menu:
         text_menu += f"НОМЕР БЛЮДА: {i['id']}\nНазвание: {i['name']}\nЦена: {i['price']}\nОписание: {i['description']}\n\n\n"

@@ -22,6 +22,19 @@ def get_or_create_user(db, effective_user, chat_id):
     return user
 
 
-def get_menu(db):
-    menu = db.menu.find()
-    return menu
+def get_menu_drinks(db):
+    menu_drinks = db.menu_drinks.find()
+    return menu_drinks 
+
+def get_menu_hot_dishes(db):
+    menu_hot_dishes = db.menu_hot_dishes.find()
+    return menu_hot_dishes
+
+def get_menu_pizza(db):
+    menu_pizza = db.menu_pizza.find()
+    return menu_pizza
+
+def get_menu_soup(db):
+    menu_soup = db.menu_soup.find()
+    return menu_soup
+

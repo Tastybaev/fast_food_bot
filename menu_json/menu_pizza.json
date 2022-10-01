@@ -1,0 +1,21 @@
+[{
+    "id": "1",
+    "name": "Маргарита",
+    "price": 2300,
+    "description": "230гр",
+    "avaliable": "True"
+},
+{
+    "id": "2",
+    "name": "Пиперони",
+    "price": 2000,
+    "description": "300гр",
+    "avaliable": "True"
+},
+{
+    "id": "3",
+    "name": "Грибная поляна",
+    "price": 2000,
+    "description": "300гр",
+    "avaliable": "True"
+}]

@@ -1,0 +1,21 @@
+[{
+    "id": "1",
+    "name": "Грибной",
+    "price": 2300,
+    "description": "230гр",
+    "avaliable": "True"
+},
+{
+    "id": "2",
+    "name": "Борщ",
+    "price": 2000,
+    "description": "300гр",
+    "avaliable": "True"
+},
+{
+    "id": "3",
+    "name": "Куриный суп",
+    "price": 2000,
+    "description": "300гр",
+    "avaliable": "True"
+}]

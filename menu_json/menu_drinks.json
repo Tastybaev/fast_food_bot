@@ -1,0 +1,21 @@
+[{
+    "id": "1",
+    "name": "Coca-cola",
+    "price": 500,
+    "description": "1л.",
+    "avaliable": "True"
+},
+{
+    "id": "2",
+    "name": "Sprite",
+    "price": 500,
+    "description": "1л.",
+    "avaliable": "True"
+},
+{
+    "id": "3",
+    "name": "Fanta",
+    "price": 500,
+    "description": "1л.",
+    "avaliable": "True"
+}]
