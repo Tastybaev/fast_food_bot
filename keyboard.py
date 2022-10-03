@@ -1,5 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram_bot_pagination import InlineKeyboardPaginator
 from telegram.ext import CallbackQueryHandler, ConversationHandler
+from db import db, get_menu_hot_dishes
 
 from settings import(
     FIRST,
@@ -65,17 +67,25 @@ def start_over(update, _):
 
 def hot_dishes(update, _):
     """Показ нового выбора кнопок"""
+    menu = get_menu_hot_dishes(db)
+    paginator = InlineKeyboardPaginator(
+        3,
+        current_page=1,
+        data_pattern='page#{page}'
+    )
     query = update.callback_query
     query.answer()
     keyboard = [
-        [
-            InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
-            InlineKeyboardButton("Напитки", callback_data=str(DRINKS)),
-        ]
+        [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
+        [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text(
+        f"{menu}",
+        reply_markup=paginator.markup
+    )
     query.edit_message_text(
-        text="Вызов `CallbackQueryHandler`, выберите маршрут", reply_markup=reply_markup
+        text="меню", reply_markup=reply_markup,
     )
     return FIRST
 
