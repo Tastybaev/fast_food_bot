@@ -1,9 +1,10 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram_bot_pagination import InlineKeyboardPaginator
 from telegram.ext import CallbackQueryHandler, ConversationHandler
-from db import db, get_menu_hot_dishes
+from db import db, get_menu_drinks, get_menu_hot_dishes, get_menu_pizza, get_menu_soup
 
 from settings import(
+    ADD_TO_SHOPPING_CART,
     FIRST,
     SECOND,
     HOT_DISHES,
@@ -11,6 +12,8 @@ from settings import(
     PIZZA,
     DRINKS
 )
+
+from utils import KEYBOARD_MENU, KEYBOARD_NAVIGATION
 
 
 def start(update, _):
@@ -22,17 +25,7 @@ def start(update, _):
     # отображаемый текст и строку `callback_data`
     # Клавиатура - это список строк кнопок, где каждая строка, 
     # в свою очередь, является списком `[[...]]`
-    keyboard = [
-        [
-            InlineKeyboardButton("Горячие блюда", callback_data=str(HOT_DISHES)),
-            InlineKeyboardButton("Супы", callback_data=str(SOUP))
-        ],
-        [
-            InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
-            InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_MENU)
     # Отправляем сообщение с текстом и добавленной клавиатурой `reply_markup`
     update.message.reply_text(
         text=f"Здравствуйте {user['first_name']}, что будете заказывать?", reply_markup=reply_markup
@@ -49,17 +42,11 @@ def start_over(update, _):
     # даже если уведомление для пользователя не требуется.
     # В противном случае у некоторых клиентов могут возникнуть проблемы.
     query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("2", callback_data=str(TWO)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_MENU)
    # Отредактируем сообщение, вызвавшее обратный вызов.
    # Это создает ощущение интерактивного меню.
     query.edit_message_text(
-        text="Выберите маршрут", reply_markup=reply_markup
+        text="Меню", reply_markup=reply_markup
     )
     # Сообщаем `ConversationHandler`, что сейчас находимся в состоянии `FIRST`
     return FIRST
@@ -68,78 +55,74 @@ def start_over(update, _):
 def hot_dishes(update, _):
     """Показ нового выбора кнопок"""
     menu = get_menu_hot_dishes(db)
-    paginator = InlineKeyboardPaginator(
-        3,
-        current_page=1,
-        data_pattern='page#{page}'
-    )
     query = update.callback_query
     query.answer()
-    keyboard = [
-        [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
-        [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text(
-        f"{menu}",
-        reply_markup=paginator.markup
-    )
-    query.edit_message_text(
-        text="меню", reply_markup=reply_markup,
-    )
-    return FIRST
+    button = [[InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART))]]
+    reply_markup = InlineKeyboardMarkup(button)
+    #надо сделать 3 сообщения вместо  одного.
+    # надо сделать автомотическое срабатывание navigation_menu()
+    for item in menu:
+        query.edit_message_text(
+            text=f"{item}", reply_markup=reply_markup,
+        )
+    return SECOND
 
 
 def soup(update, _):
     """Показ нового выбора кнопок"""
+    menu = get_menu_soup(db)
     query = update.callback_query
     query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Второй CallbackQueryHandler", reply_markup=reply_markup
-    )
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    for item in menu:
+        query.edit_message_text(
+            text=f"{item}", reply_markup=reply_markup,
+        )
     return FIRST
 
 
 def pizza(update, _):
     """Показ выбора кнопок"""
+    menu = get_menu_pizza(db)
     query = update.callback_query
     query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("Да, сделаем это снова!", callback_data=str(ONE)),
-            InlineKeyboardButton("Нет, с меня хватит ...", callback_data=str(TWO)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Третий CallbackQueryHandler. Начать сначала?", reply_markup=reply_markup
-    )
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    for item in menu:
+        query.edit_message_text(
+            text=f"{item}", reply_markup=reply_markup,
+        )
     # Переход в состояние разговора `SECOND`
-    return SECOND
+    return FIRST
 
 
 def drinks(update, _):
     """Показ выбора кнопок"""
+    menu = get_menu_drinks(db)
     query = update.callback_query
     query.answer()
     keyboard = [
-        [
-            InlineKeyboardButton("2", callback_data=str(TWO)),
-            InlineKeyboardButton("4", callback_data=str(FOUR)),
-        ]
+        [InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART))]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Четвертый CallbackQueryHandler, выберите маршрут", reply_markup=reply_markup
-    )
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    for item in menu:
+        query.edit_message_text(
+            text=f"{item}", reply_markup=reply_markup,
+        )
     return FIRST
+
+# def add_to_shopping_cart(update, _):
+# def shopping_cart()
+
+
+def navigation_menu(update, _):
+    query = update.callback_query
+    query.answer()
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    query.edit_message_text(
+        text="Для оформления заказа выбирите блюда и перейдите в корзину",
+        reply_markup=reply_markup
+    )
+    return SECOND
 
 
 def end(update, _):

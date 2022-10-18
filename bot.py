@@ -9,6 +9,7 @@ from telegram.ext import (
 )
 from old_handlers import menu_message
 from keyboard import(
+    navigation_menu,
     start,
     start_over,
     hot_dishes,
@@ -18,7 +19,7 @@ from keyboard import(
     end
 )
 
-from settings import TELEGRAM_TOKEN
+from settings import ADD_TO_SHOPPING_CART, BACK, TELEGRAM_TOKEN, THIRD
 from settings import(
     FIRST,
     SECOND,
@@ -57,7 +58,11 @@ def main():
                 CallbackQueryHandler(drinks, pattern='^' + str(DRINKS) + '$'),
             ],
             SECOND: [
-                CallbackQueryHandler(start_over, pattern='^' + str(HOT_DISHES) + '$'),
+                CallbackQueryHandler(navigation_menu, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
+                CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
+            ],
+            THIRD: [
+                CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
                 CallbackQueryHandler(end, pattern='^' + str(SOUP) + '$'),
             ],
         },

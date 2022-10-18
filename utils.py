@@ -1,5 +1,32 @@
-from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, InlineKeyboardButton
 
+from settings import(
+    BACK,
+    FIRST,
+    SECOND,
+    HOT_DISHES,
+    SOUP,
+    PIZZA,
+    DRINKS
+)
+
+KEYBOARD_NAVIGATION = [
+        [InlineKeyboardButton("Показать еще", callback_data=str(PIZZA))],
+        [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
+        [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))],
+        [InlineKeyboardButton("Назад", callback_data=str(BACK))]
+    ]
+
+KEYBOARD_MENU = [
+        [
+            InlineKeyboardButton("Горячие блюда", callback_data=str(HOT_DISHES)),
+            InlineKeyboardButton("Супы", callback_data=str(SOUP))
+        ],
+        [
+            InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
+            InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
+        ]
+    ]
 
 def order_keyboard():
     return ReplyKeyboardMarkup([
@@ -11,3 +38,4 @@ def main_keyboard():
     return ReplyKeyboardMarkup([
         ["Меню", "Заказать"]
     ])
+
