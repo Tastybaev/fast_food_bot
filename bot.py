@@ -9,8 +9,10 @@ from telegram.ext import (
 )
 from old_handlers import menu_message
 from keyboard import(
+    Main,
+    add_to_shopping_cart,
     navigation_menu,
-    start,
+    # start,
     start_over,
     hot_dishes,
     soup,
@@ -19,7 +21,7 @@ from keyboard import(
     end
 )
 
-from settings import ADD_TO_SHOPPING_CART, BACK, TELEGRAM_TOKEN, THIRD
+from settings import ADD_TO_SHOPPING_CART, BACK, NAVIGATION_MENU, TELEGRAM_TOKEN, THIRD
 from settings import(
     FIRST,
     SECOND,
@@ -31,9 +33,9 @@ from settings import(
 
 logging.basicConfig(filename='bot.log', level=logging.INFO)
 def main():
+    roots = Main()
     fast_food_bot = Updater(token=TELEGRAM_TOKEN)
     dp = fast_food_bot.dispatcher
-
     # order = ConversationHandler(
     #     entry_points=[MessageHandler(Filters.regex("^(Заказать)$"), order_start)],
     #     states={
@@ -49,16 +51,17 @@ def main():
     # )
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', roots.start)],
         states={ # словарь состояний разговора, возвращаемых callback функциями
             FIRST: [
-                CallbackQueryHandler(hot_dishes, pattern='^' + str(HOT_DISHES) + '$'),
+                CallbackQueryHandler(roots.hot_dishes, pattern='^' + str(HOT_DISHES) + '$'),
                 CallbackQueryHandler(soup, pattern='^' + str(SOUP) + '$'),
                 CallbackQueryHandler(pizza, pattern='^' + str(PIZZA) + '$'),
-                CallbackQueryHandler(drinks, pattern='^' + str(DRINKS) + '$'),
+                CallbackQueryHandler(drinks, pattern='^' + str(DRINKS) + '$')
             ],
             SECOND: [
-                CallbackQueryHandler(navigation_menu, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
+                CallbackQueryHandler(add_to_shopping_cart, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
+                CallbackQueryHandler(navigation_menu, pattern='^' + str(NAVIGATION_MENU) + '$'),
                 CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
             ],
             THIRD: [
@@ -66,12 +69,12 @@ def main():
                 CallbackQueryHandler(end, pattern='^' + str(SOUP) + '$'),
             ],
         },
-        fallbacks=[CommandHandler('start', start)],
+        fallbacks=[CommandHandler('start', roots.start)],
     )
 
 
     dp.add_handler(conv_handler)
-    dp.add_handler(CommandHandler('start', start))
+    # dp.add_handler(CommandHandler('start', start))
     dp.add_handler(MessageHandler(Filters.regex("^(Меню)$"), menu_message))
 
     logging.info('BOT IS STARTED!')

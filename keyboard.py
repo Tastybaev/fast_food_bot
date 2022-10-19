@@ -13,25 +13,47 @@ from settings import(
     DRINKS
 )
 
-from utils import KEYBOARD_MENU, KEYBOARD_NAVIGATION
+from utils import KEYBOARD_MENU, KEYBOARD_NAVIGATION, KEYBOARD_SHOPPING_CART
+
+class Main():
+    def __init__(self):
+        self.chat_id = None
 
 
-def start(update, _):
-    """Вызывается по команде `/start`."""
-    # Получаем пользователя, который запустил команду `/start`
-    user = update.message.from_user
-    # logger.info("Пользователь %s начал разговор", user.first_name)
-    # Создаем `InlineKeyboard`, где каждая кнопка имеет 
-    # отображаемый текст и строку `callback_data`
-    # Клавиатура - это список строк кнопок, где каждая строка, 
-    # в свою очередь, является списком `[[...]]`
-    reply_markup = InlineKeyboardMarkup(KEYBOARD_MENU)
-    # Отправляем сообщение с текстом и добавленной клавиатурой `reply_markup`
-    update.message.reply_text(
-        text=f"Здравствуйте {user['first_name']}, что будете заказывать?", reply_markup=reply_markup
-    )
-    # Сообщаем `ConversationHandler`, что сейчас состояние `FIRST`
-    return FIRST
+    def start(self, update, _):
+        """Вызывается по команде `/start`."""
+        # Получаем пользователя, который запустил команду `/start`
+        self.user = update.message.from_user
+        self.chat_id = update.message.chat_id
+        # logger.info("Пользователь %s начал разговор", user.first_name)
+        # Создаем `InlineKeyboard`, где каждая кнопка имеет 
+        # отображаемый текст и строку `callback_data`
+        # Клавиатура - это список строк кнопок, где каждая строка, 
+        # в свою очередь, является списком `[[...]]`
+        reply_markup = InlineKeyboardMarkup(KEYBOARD_MENU)
+        # Отправляем сообщение с текстом и добавленной клавиатурой `reply_markup`
+        update.message.reply_text(
+            text=f"Здравствуйте {self.user['first_name']}{self.chat_id}, что будете заказывать?", reply_markup=reply_markup
+        )
+        # Сообщаем `ConversationHandler`, что сейчас состояние `FIRST`
+        return FIRST
+
+    def hot_dishes(self, update, context):
+        """Показ нового выбора кнопок"""
+        self.menu = get_menu_hot_dishes(db)
+        self.query = update.callback_query
+        self.query.answer()
+        reply_markup = InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART)
+        #надо сделать 3 сообщения вместо  одного.
+        # надо сделать автомотическое срабатывание navigation_menu()
+        for item in self.menu:
+            context.bot.send_message(
+                chat_id=self.chat_id,
+                text=f"{item}", reply_markup=reply_markup,
+            )
+        # bot = context.bot.send_message(text='еда!!!')
+        return SECOND
+
 
 
 def start_over(update, _):
@@ -52,19 +74,21 @@ def start_over(update, _):
     return FIRST
 
 
-def hot_dishes(update, _):
+def hot_dishes(update, context):
     """Показ нового выбора кнопок"""
     menu = get_menu_hot_dishes(db)
     query = update.callback_query
     query.answer()
-    button = [[InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART))]]
-    reply_markup = InlineKeyboardMarkup(button)
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART)
+    chat_id = update.message.chat_id
     #надо сделать 3 сообщения вместо  одного.
     # надо сделать автомотическое срабатывание navigation_menu()
     for item in menu:
-        query.edit_message_text(
+        context.bot.send_message(
+            chat_id=chat_id,
             text=f"{item}", reply_markup=reply_markup,
         )
+    # bot = context.bot.send_message(text='еда!!!')
     return SECOND
 
 
@@ -78,7 +102,7 @@ def soup(update, _):
         query.edit_message_text(
             text=f"{item}", reply_markup=reply_markup,
         )
-    return FIRST
+    return SECOND
 
 
 def pizza(update, _):
@@ -92,7 +116,7 @@ def pizza(update, _):
             text=f"{item}", reply_markup=reply_markup,
         )
     # Переход в состояние разговора `SECOND`
-    return FIRST
+    return SECOND
 
 
 def drinks(update, _):
@@ -108,10 +132,16 @@ def drinks(update, _):
         query.edit_message_text(
             text=f"{item}", reply_markup=reply_markup,
         )
-    return FIRST
+    return SECOND
 
-# def add_to_shopping_cart(update, _):
-# def shopping_cart()
+def add_to_shopping_cart(update, _):
+    query = update.callback_query
+    query.answer()
+    reply_markup = InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    _.user_data['hot_dishes'] = ['1']
+    # Надо доделать добавление id в корзину.
+
+# def my_shopping_cart(update, _):
 
 
 def navigation_menu(update, _):

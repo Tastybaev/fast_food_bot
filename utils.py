@@ -1,8 +1,10 @@
 from telegram import ReplyKeyboardMarkup, InlineKeyboardButton
 
 from settings import(
+    ADD_TO_SHOPPING_CART,
     BACK,
     FIRST,
+    NAVIGATION_MENU,
     SECOND,
     HOT_DISHES,
     SOUP,
@@ -27,6 +29,15 @@ KEYBOARD_MENU = [
             InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
         ]
     ]
+
+KEYBOARD_SHOPPING_CART = [
+    [
+        InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART))
+    ],
+    [
+        InlineKeyboardButton("Навигация", callback_data=str(NAVIGATION_MENU))
+    ]
+]
 
 def order_keyboard():
     return ReplyKeyboardMarkup([
