@@ -19,3 +19,23 @@
     "description": "1л.",
     "avaliable": "True"
 }]
+
+// {'message_id': 1818,
+//     'chat': {'username': 'ExLotr', 'id': 219153484, 'type': 'private', 'first_name': 'Даниил'},
+//     'supergroup_chat_created': False,
+//     'new_chat_photo': [],
+//     'channel_chat_created': False,
+//     'caption_entities': [],
+//     'entities': [],
+//     'date': 1666796132,
+//     'photo': [],
+//     'reply_markup': {'inline_keyboard': [[{'callback_data': 'Добавить в корзину', 'text': 'Добавить в корзину'}]]},
+//     'delete_chat_photo': False,
+//     'new_chat_members': [],
+//     'text': "{'_id': ObjectId('63345ad8cfc4f81aa4b6925f'), 'id': '3', 'name': 'Плов', 'price': 2000, 'description': '300гр', 'avaliable': 'True'}",
+//     'group_chat_created': False,
+//     'from': {'username': 'fast_food_telegram_bot',
+//     'is_bot': True,
+//     'id': 5634189141,
+//     'first_name': 'fast_food_bot'}
+// }
