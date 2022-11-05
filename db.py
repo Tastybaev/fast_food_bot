@@ -28,13 +28,6 @@ def get_chat_id(db, effective_user):
         'user_id': effective_user.id,
     })
     return user['chat_id']
-
-
-def create_message_id(db, effective_user, message_id):
-    db.user.update_one(
-        {'user_id': effective_user.id},
-        {'$push':{'message_id': message_id}}
-    )
     
 
 def get_menu_drinks(db):

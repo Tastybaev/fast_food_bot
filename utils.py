@@ -1,4 +1,4 @@
-from telegram import ReplyKeyboardMarkup, InlineKeyboardButton
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
 from settings import(
     ADD_TO_SHOPPING_CART,
@@ -44,3 +44,31 @@ def main_keyboard():
         ["Меню", "Заказать"]
     ])
 
+
+def save_message_id(message_id, context):
+        context.user_data['message_ids'].append(message_id['message_id'])
+
+
+def delete_message(chat_id, context):
+    for message_id in context.user_data['message_ids']:
+        context.bot.deleteMessage(
+            chat_id=chat_id,
+            message_id=message_id
+        )
+    context.user_data['message_ids'].clear()
+
+
+def send_message(menu, chat_id, context):
+    for item in menu:
+        message_id = context.bot.send_message(
+            chat_id=chat_id,
+            text=f"Название: {item['name']}\nЦена: {item['price']}\nОписание: {item['description']}",
+            reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
+        )
+        save_message_id(message_id, context)
+    message_id = context.bot.send_message(
+        chat_id=chat_id,
+        text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
+        reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
+    )
+    save_message_id(message_id, context)

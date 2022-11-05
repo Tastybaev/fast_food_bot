@@ -1,7 +1,6 @@
 from telegram import InlineKeyboardMarkup
 from telegram.ext import ConversationHandler
 from db import (
-    create_message_id,
     db,
     get_menu_drinks,
     get_menu_hot_dishes,
@@ -16,10 +15,18 @@ from settings import(
     SECOND
 )
 
-from utils import KEYBOARD_MENU, KEYBOARD_NAVIGATION, KEYBOARD_SHOPPING_CART
+from utils import (
+    KEYBOARD_MENU,
+    KEYBOARD_NAVIGATION,
+    KEYBOARD_SHOPPING_CART,
+    delete_message,
+    send_message,
+    save_message_id,
+)
+
 
 class Main():
-    def start(self, update, _):
+    def start(self, update, context):
         """Вызывается по команде `/start`."""
         # Получаем пользователя, который запустил команду `/start`
         user = get_or_create_user(db, update.effective_user, update.message.chat_id)
@@ -30,10 +37,12 @@ class Main():
         # в свою очередь, является списком `[[...]]`
         reply_markup = InlineKeyboardMarkup(KEYBOARD_MENU)
         # Отправляем сообщение с текстом и добавленной клавиатурой `reply_markup`
-        update.message.reply_text(
+        message_id = update.message.reply_text(
             text=f"Здравствуйте {user['first_name']}, что будете заказывать?", reply_markup=reply_markup
         )
         # Сообщаем `ConversationHandler`, что сейчас состояние `FIRST`
+        context.user_data['message_ids'] = []
+        save_message_id(message_id, context)
         return FIRST
 
     def start_over(self, update, context):
@@ -47,17 +56,13 @@ class Main():
         # Отредактируем сообщение, вызвавшее обратный вызов.
         # Это создает ощущение интерактивного меню.
         chat_id = get_chat_id(db, update.effective_user)
-        for message_id in context.user_data['message_ids']:
-            context.bot.deleteMessage(
-                chat_id=chat_id,
-                message_id=message_id
-            )
-            print(message_id)
+        delete_message(chat_id, context)
         message_id = context.bot.send_message(
             chat_id=chat_id,
             text="Меню",
             reply_markup=InlineKeyboardMarkup(KEYBOARD_MENU)
         )
+        save_message_id(message_id, context)
         # Сообщаем `ConversationHandler`, что сейчас находимся в состоянии `FIRST`
         return FIRST
 
@@ -67,25 +72,8 @@ class Main():
         menu = get_menu_hot_dishes(db)
         query = update.callback_query
         query.answer()
-        #надо сделать 3 сообщения вместо  одного.
-        # надо сделать автомотическое срабатывание navigation_menu()
-        message_ids = []
-        for item in menu:
-            message_id = context.bot.send_message(
-                chat_id=chat_id,
-                text=f"{item}",
-                reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
-            )
-            message_ids.append(message_id['message_id'])
-            # print(message_ids)
-            # create_message_id(db, update.effective_user, message_id['message_id'])
-        message_id = context.bot.send_message(
-            chat_id=chat_id,
-            text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
-            reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
-        )
-        message_ids.append(message_id['message_id'])
-        context.user_data['message_ids'] = message_ids
+        delete_message(chat_id, context)
+        send_message(menu, chat_id, context)
         return SECOND
 
     def soup(self, update, context):
