@@ -82,17 +82,8 @@ class Main():
         menu = get_menu_soup(db)
         query = update.callback_query
         query.answer()
-        for item in menu:
-            context.bot.send_message(
-                chat_id=chat_id,
-                text=f"{item}",
-                reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
-            )
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
-            reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
-        )
+        delete_message(chat_id, context)
+        send_message(menu, chat_id, context)
         return SECOND
 
     def pizza(self, update, context):
@@ -101,17 +92,8 @@ class Main():
         menu = get_menu_pizza(db)
         query = update.callback_query
         query.answer()
-        for item in menu:
-            context.bot.send_message(
-                chat_id=chat_id,
-                text=f"{item}",
-                reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
-            )
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
-            reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
-        )
+        delete_message(chat_id, context)
+        send_message(menu, chat_id, context)
         return SECOND
 
     def drinks(self, update, context):
@@ -120,18 +102,8 @@ class Main():
         menu = get_menu_drinks(db)
         query = update.callback_query
         query.answer()
-        reply_markup = InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART)
-        for item in menu:
-            context.bot.send_message(
-                chat_id=chat_id,
-                text=f"{item}",
-                reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
-            )
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
-            reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
-        )
+        delete_message(chat_id, context)
+        send_message(menu, chat_id, context)
         return SECOND
 
     def add_to_shopping_cart(self, update, _):
