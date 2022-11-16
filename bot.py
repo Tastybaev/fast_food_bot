@@ -6,42 +6,56 @@ from telegram.ext import (
     CallbackQueryHandler
 )
 
-from keyboard import Main
+from keyboard import (
+    start,
+    start_over,
+    hot_dishes,
+    soup,
+    pizza,
+    drinks,
+    add_to_shopping_cart,
+    end
+)
 
-from settings import ADD_TO_SHOPPING_CART, BACK, TELEGRAM_TOKEN, THIRD
-from settings import(
+from settings import TELEGRAM_TOKEN
+
+from utils import(
+    ADD_TO_SHOPPING_CART,
     FIRST,
     SECOND,
+    THIRD,
     HOT_DISHES,
     SOUP,
     PIZZA,
-    DRINKS
+    DRINKS,
+    BACK,
 )
 
 logging.basicConfig(filename='bot.log', level=logging.INFO)
+
+
 def main():
-    roots = Main()
-    fast_food_bot = Updater(token=TELEGRAM_TOKEN)
+    fast_food_bot = Updater(TELEGRAM_TOKEN)
     dp = fast_food_bot.dispatcher
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', roots.start)],
+        entry_points=[CommandHandler('start', start)],
         states={ # словарь состояний разговора, возвращаемых callback функциями
             FIRST: [
-                CallbackQueryHandler(roots.hot_dishes, pattern='^' + str(HOT_DISHES) + '$'),
-                CallbackQueryHandler(roots.soup, pattern='^' + str(SOUP) + '$'),
-                CallbackQueryHandler(roots.pizza, pattern='^' + str(PIZZA) + '$'),
-                CallbackQueryHandler(roots.drinks, pattern='^' + str(DRINKS) + '$')
+                CallbackQueryHandler(hot_dishes, pattern='^' + str(HOT_DISHES) + '$'),
+                CallbackQueryHandler(soup, pattern='^' + str(SOUP) + '$'),
+                CallbackQueryHandler(pizza, pattern='^' + str(PIZZA) + '$'),
+                CallbackQueryHandler(drinks, pattern='^' + str(DRINKS) + '$')
             ],
             SECOND: [
-                CallbackQueryHandler(roots.add_to_shopping_cart, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
-                CallbackQueryHandler(roots.start_over, pattern='^' + str(BACK) + '$'),
+                CallbackQueryHandler(add_to_shopping_cart, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
+                CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
             ],
             THIRD: [
-                CallbackQueryHandler(roots.start_over, pattern='^' + str(BACK) + '$'),
-                CallbackQueryHandler(roots.end, pattern='^' + str(SOUP) + '$'),
+                CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
+                CallbackQueryHandler(end, pattern='^' + str(SOUP) + '$'),
             ],
         },
-        fallbacks=[CommandHandler('start', roots.start)],
+        fallbacks=[CommandHandler('start', start)],
     )
 
 

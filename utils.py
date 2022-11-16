@@ -1,35 +1,58 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
-from settings import(
-    ADD_TO_SHOPPING_CART,
-    BACK,
-    HOT_DISHES,
-    SOUP,
-    PIZZA,
-    DRINKS
+
+FIRST, SECOND, THIRD, FOURTH = range(4)
+
+HOT_DISHES, SOUP, PIZZA, DRINKS = (
+    'Горячие блюда',
+    'Супы',
+    'Пицца',
+    'Напитки'
+)
+
+BACK, ADD_TO_SHOPPING_CART, REMOVE_FROM_SHOPPING_CART = (
+    'Назад',
+    'Добавить в корзину',
+    'Удалить'
+    )
+
+INCREASE, DECREASE = (
+    '+',
+    '-'
 )
 
 KEYBOARD_NAVIGATION = [
-        [InlineKeyboardButton("Показать еще", callback_data=str(PIZZA))],
-        [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
-        [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))],
-        [InlineKeyboardButton("Назад", callback_data=str(BACK))]
-    ]
+    [InlineKeyboardButton("Показать еще", callback_data=str(PIZZA))],
+    [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
+    [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))],
+    [InlineKeyboardButton("Назад", callback_data=str(BACK))]
+]
 
 KEYBOARD_MENU = [
-        [
-            InlineKeyboardButton("Горячие блюда", callback_data=str(HOT_DISHES)),
-            InlineKeyboardButton("Супы", callback_data=str(SOUP))
-        ],
-        [
-            InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
-            InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
-        ]
+    [
+        InlineKeyboardButton("Горячие блюда", callback_data=str(HOT_DISHES)),
+        InlineKeyboardButton("Супы", callback_data=str(SOUP))
+    ],
+    [
+        InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
+        InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
     ]
+]
 
 KEYBOARD_SHOPPING_CART = [
     [
-        InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART))
+        InlineKeyboardButton("Добавить в корзину", callback_data=str(ADD_TO_SHOPPING_CART)),
+    ]
+]
+
+KEYBOARD_SET_PORTION = [
+    [
+        InlineKeyboardButton('-', callback_data=str(DECREASE)),
+        InlineKeyboardButton('1', callback_data=str('1')), #Надо вставить переменную для указания количества добавленных порций.
+        InlineKeyboardButton('+', callback_data=str(INCREASE))
+    ],
+    [
+        InlineKeyboardButton('Удалить', callback_data=str(REMOVE_FROM_SHOPPING_CART))
     ]
 ]
 
@@ -72,3 +95,4 @@ def send_message(menu, chat_id, context):
         reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
     )
     save_message_id(message_id, context)
+
