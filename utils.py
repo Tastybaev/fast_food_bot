@@ -68,11 +68,16 @@ def main_keyboard():
     ])
 
 
-def save_message_id(message_id, context):
+def save_dish_id(context, dish_id, menu_type):
+    context.user_data[menu_type].append(dish_id)
+    print(dish_id, menu_type)
+
+
+def save_message_id(context, message_id):
         context.user_data['message_ids'].append(message_id['message_id'])
 
 
-def delete_message(chat_id, context):
+def delete_message(context, chat_id):
     for message_id in context.user_data['message_ids']:
         context.bot.deleteMessage(
             chat_id=chat_id,
@@ -81,18 +86,17 @@ def delete_message(chat_id, context):
     context.user_data['message_ids'].clear()
 
 
-def send_message(menu, chat_id, context):
+def send_message(context, chat_id, menu, menu_type):
     for item in menu:
         message_id = context.bot.send_message(
             chat_id=chat_id,
-            text=f"Название: {item['name']}\nЦена: {item['price']}\nОписание: {item['description']}",
+            text=f"Название: {item['name']}\nЦена: {item['price']}\nОписание: {item['description']}\nID: {menu_type}_{item['id']}",
             reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
         )
-        save_message_id(message_id, context)
+        save_message_id(context, message_id)
     message_id = context.bot.send_message(
         chat_id=chat_id,
         text="Для оформления заказа выбирите интересующее блюдо и перейдите в корзину.",
         reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
     )
-    save_message_id(message_id, context)
-
+    save_message_id(context, message_id)
