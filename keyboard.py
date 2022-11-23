@@ -4,7 +4,7 @@ from telegram.ext import ConversationHandler
 from db import (db, get_chat_id, get_menu_drinks, get_menu_hot_dishes,
                 get_menu_pizza, get_menu_soup, get_or_create_user)
 from utils import (FIRST, KEYBOARD_MENU, KEYBOARD_SET_PORTION, SECOND,
-                   delete_message, save_dish_id, save_message_id, send_message)
+                   delete_message, save_message_id, send_message)
 
 
 def start(update, context):
@@ -75,6 +75,7 @@ def drinks(update, context):
 def add_to_shopping_cart(update, context):
     query = update.callback_query
     query.answer()
+    order = {}
     chat_id = get_chat_id(db, update.effective_user)
     message_id = query['message']['message_id']
     message = context.bot.edit_message_reply_markup(
@@ -82,10 +83,9 @@ def add_to_shopping_cart(update, context):
         chat_id=chat_id,
         reply_markup=InlineKeyboardMarkup(KEYBOARD_SET_PORTION)
     )
-    print(message)
-    print(message['text'].split()[-1])
-    # save_dish_id(context, dish_id, menu_type)
-    # context.user_data['hot_dishes'] = ['1']
+    order[message['text'].split()[-1].split('.')[-1]] = 1
+    context.user_data[message['text'].split()[-1].split('.')[0]].append(order)
+    # print(context.user_data)
     return SECOND
 
 # def my_shopping_cart(update, _):

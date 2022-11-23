@@ -68,9 +68,9 @@ def main_keyboard():
     ])
 
 
-def save_dish_id(context, dish_id, menu_type):
-    context.user_data[menu_type].append(dish_id)
-    print(dish_id, menu_type)
+# def save_dish_id(context, dish_id, menu_type):
+#     context.user_data[menu_type].append(dish_id)
+#     print(dish_id, menu_type)
 
 
 def save_message_id(context, message_id):
@@ -90,7 +90,12 @@ def send_message(context, chat_id, menu, menu_type):
     for item in menu:
         message_id = context.bot.send_message(
             chat_id=chat_id,
-            text=f"Название: {item['name']}\nЦена: {item['price']}\nОписание: {item['description']}\nID: {menu_type}_{item['id']}",
+            text=f'''
+            Название: {item['name']}
+Цена: {item['price']}
+Описание: {item['description']}
+ID: {menu_type}.{item['id']}
+            ''',
             reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
         )
         save_message_id(context, message_id)
