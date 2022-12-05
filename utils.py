@@ -1,7 +1,13 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
-
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    ParseMode
+)
 
 FIRST, SECOND, THIRD, FOURTH = range(4)
+
+MENU = ['hot_dishes', 'soup', 'pizza', 'drinks']
 
 HOT_DISHES, SOUP, PIZZA, DRINKS = (
     'Горячие блюда',
@@ -17,8 +23,8 @@ BACK, ADD_TO_SHOPPING_CART, REMOVE_FROM_SHOPPING_CART = (
     )
 
 INCREASE, DECREASE = (
-    '+',
-    '-'
+    '▲',
+    '▼'
 )
 
 KEYBOARD_NAVIGATION = [
@@ -47,9 +53,9 @@ KEYBOARD_SHOPPING_CART = [
 
 KEYBOARD_SET_PORTION = [
     [
-        InlineKeyboardButton('-', callback_data=str(DECREASE)),
+        InlineKeyboardButton('▼', callback_data=str(DECREASE)),
         InlineKeyboardButton('1', callback_data=str('1')), #Надо вставить переменную для указания количества добавленных порций.
-        InlineKeyboardButton('+', callback_data=str(INCREASE))
+        InlineKeyboardButton('▲', callback_data=str(INCREASE))
     ],
     [
         InlineKeyboardButton('Удалить', callback_data=str(REMOVE_FROM_SHOPPING_CART))
@@ -66,11 +72,6 @@ def main_keyboard():
     return ReplyKeyboardMarkup([
         ["Меню", "Заказать"]
     ])
-
-
-# def save_dish_id(context, dish_id, menu_type):
-#     context.user_data[menu_type].append(dish_id)
-#     print(dish_id, menu_type)
 
 
 def save_message_id(context, message_id):
@@ -90,13 +91,14 @@ def send_message(context, chat_id, menu, menu_type):
     for item in menu:
         message_id = context.bot.send_message(
             chat_id=chat_id,
-            text=f'''
+            text=f"""
             Название: {item['name']}
 Цена: {item['price']}
 Описание: {item['description']}
-ID: {menu_type}.{item['id']}
-            ''',
+<span class="tg-spoiler">ID: {menu_type}.{item['id']}</span>
+            """,
             reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART),
+            parse_mode = ParseMode.HTML
         )
         save_message_id(context, message_id)
     message_id = context.bot.send_message(
@@ -105,3 +107,8 @@ ID: {menu_type}.{item['id']}
         reply_markup=InlineKeyboardMarkup(KEYBOARD_NAVIGATION)
     )
     save_message_id(context, message_id)
+
+
+def create_menu_list(context, menu_type):
+    if not context.user_data.get(menu_type):
+        context.user_data[menu_type] = []

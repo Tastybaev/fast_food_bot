@@ -14,6 +14,8 @@ from keyboard import (
     pizza,
     drinks,
     add_to_shopping_cart,
+    increase_dish,
+    decrease_dish,
     end
 )
 
@@ -29,6 +31,8 @@ from utils import(
     PIZZA,
     DRINKS,
     BACK,
+    DECREASE,
+    INCREASE
 )
 
 logging.basicConfig(filename='bot.log', level=logging.INFO)
@@ -49,6 +53,8 @@ def main():
             SECOND: [
                 CallbackQueryHandler(add_to_shopping_cart, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
                 CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
+                CallbackQueryHandler(increase_dish, pattern='^' + str(INCREASE) + '$'),
+                CallbackQueryHandler(decrease_dish, pattern='^' + str(DECREASE) + '$'),
             ],
             THIRD: [
                 CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
@@ -57,7 +63,6 @@ def main():
         },
         fallbacks=[CommandHandler('start', start)],
     )
-
 
     dp.add_handler(conv_handler)
 

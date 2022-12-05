@@ -3,8 +3,8 @@ from telegram.ext import ConversationHandler
 
 from db import (db, get_chat_id, get_menu_drinks, get_menu_hot_dishes,
                 get_menu_pizza, get_menu_soup, get_or_create_user)
-from utils import (FIRST, KEYBOARD_MENU, KEYBOARD_SET_PORTION, SECOND,
-                   delete_message, save_message_id, send_message)
+from utils import (MENU, FIRST, KEYBOARD_MENU, KEYBOARD_SET_PORTION, SECOND,
+                   delete_message, save_message_id, send_message, create_menu_list)
 
 
 def start(update, context):
@@ -37,7 +37,7 @@ def hot_dishes(update, context):
     chat_id = get_chat_id(db, update.effective_user)
     menu = get_menu_hot_dishes(db)
     menu_type = 'hot_dishes'
-    context.user_data[menu_type] = []
+    create_menu_list(context, menu_type)
     delete_message(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
@@ -47,7 +47,7 @@ def soup(update, context):
     chat_id = get_chat_id(db, update.effective_user)
     menu = get_menu_soup(db)
     menu_type = 'soup'
-    context.user_data[menu_type] = []
+    create_menu_list(context, menu_type)
     delete_message(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
@@ -57,7 +57,7 @@ def pizza(update, context):
     chat_id = get_chat_id(db, update.effective_user)
     menu = get_menu_pizza(db)
     menu_type = 'pizza'
-    context.user_data[menu_type] = []
+    create_menu_list(context, menu_type)
     delete_message(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
@@ -67,7 +67,7 @@ def drinks(update, context):
     chat_id = get_chat_id(db, update.effective_user)
     menu = get_menu_drinks(db)
     menu_type = 'drinks'
-    context.user_data[menu_type] = []
+    create_menu_list(context, menu_type)
     delete_message(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
@@ -83,10 +83,50 @@ def add_to_shopping_cart(update, context):
         chat_id=chat_id,
         reply_markup=InlineKeyboardMarkup(KEYBOARD_SET_PORTION)
     )
-    order[message['text'].split()[-1].split('.')[-1]] = 1
-    context.user_data[message['text'].split()[-1].split('.')[0]].append(order)
-    # print(context.user_data)
+    dish_type = message['text'].split()[-1].split('.')[0]
+    dish_id = message['text'].split()[-1].split('.')[-1]
+    order[dish_id] = 1
+    print(not context.user_data[dish_type])
+    if not context.user_data[dish_type]:
+        context.user_data[dish_type].append(order)
+    else:
+        for dish in context.user_data[dish_type]:
+            if dish.get(dish_id, False):
+                dish[dish_id] += 1
+                break
+        else:
+            context.user_data[dish_type].append(order)
+    print(context.user_data)
     return SECOND
+
+
+def increase_dish(update, context):
+    query = update.callback_query
+    query.answer()
+    dish = query['message']['text'].split()[-1]
+    dish_id = dish.split('.')[-1]
+    dish_type = dish.split('.')[0]
+    for dish in context.user_data[dish_type]:
+        if dish_id in dish:
+            dish[dish_id] += 1
+            break
+    print(context.user_data)
+    return SECOND
+
+
+def decrease_dish(update, context):
+    query = update.callback_query
+    query.answer()
+    dish = query['message']['text'].split()[-1]
+    dish_id = dish.split('.')[-1]
+    dish_type = dish.split('.')[0]
+    for dish in context.user_data[dish_type]:
+        if dish_id in dish and dish[dish_id] > 0:
+            dish[dish_id] -= 1
+            break
+    print(context.user_data)
+    return SECOND
+
 
 # def my_shopping_cart(update, _):
 
