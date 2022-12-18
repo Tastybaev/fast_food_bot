@@ -48,3 +48,23 @@ def get_menu_pizza(db):
 def get_menu_soup(db):
     menu_soup = db.menu_soup.find()
     return menu_soup
+
+def get_menu(menu_type):
+    if menu_type == 'hot_dishes':
+        return get_menu_hot_dishes(db)
+    elif menu_type == 'soup':
+        return get_menu_soup(db)
+    elif menu_type == 'pizza':
+        return get_menu_pizza(db)
+    elif menu_type == 'drinks':
+        return get_menu_drinks(db)  
+
+def get_dish(dish_type, id):
+    if dish_type == 'hot_dishes':
+        return db.menu_hot_dishes.find_one({'id':id})
+    elif dish_type == 'soup':
+        return db.menu_soup.find_one({'id':id})
+    elif dish_type == 'pizza':
+        return db.menu_pizza.find_one({'id':id})
+    elif dish_type == 'drinks':
+        return db.menu_drinks.find_one({'id':id})

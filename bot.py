@@ -14,8 +14,10 @@ from keyboard import (
     pizza,
     drinks,
     add_to_shopping_cart,
+    delete_from_shopping_cart,
     increase_dish,
     decrease_dish,
+    my_shopping_cart,
     end
 )
 
@@ -23,6 +25,9 @@ from settings import TELEGRAM_TOKEN
 
 from utils import(
     ADD_TO_SHOPPING_CART,
+    REMOVE_FROM_SHOPPING_CART,
+    MY_SHOPPING_CART,
+    MAKE_ORDER,
     FIRST,
     SECOND,
     THIRD,
@@ -52,12 +57,15 @@ def main():
             ],
             SECOND: [
                 CallbackQueryHandler(add_to_shopping_cart, pattern='^' + str(ADD_TO_SHOPPING_CART) + '$'),
+                CallbackQueryHandler(delete_from_shopping_cart, pattern='^' + str(REMOVE_FROM_SHOPPING_CART) + '$'),
                 CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
                 CallbackQueryHandler(increase_dish, pattern='^' + str(INCREASE) + '$'),
                 CallbackQueryHandler(decrease_dish, pattern='^' + str(DECREASE) + '$'),
+                CallbackQueryHandler(my_shopping_cart, pattern='^' + str(MY_SHOPPING_CART) + '$'),
             ],
             THIRD: [
                 CallbackQueryHandler(start_over, pattern='^' + str(BACK) + '$'),
+                CallbackQueryHandler(delete_from_shopping_cart, pattern='^' + str(REMOVE_FROM_SHOPPING_CART) + '$'),
                 CallbackQueryHandler(end, pattern='^' + str(SOUP) + '$'),
             ],
         },

@@ -5,6 +5,8 @@ from telegram import (
     ParseMode
 )
 
+from db import get_menu, get_dish
+
 FIRST, SECOND, THIRD, FOURTH = range(4)
 
 MENU = ['hot_dishes', 'soup', 'pizza', 'drinks']
@@ -16,10 +18,12 @@ HOT_DISHES, SOUP, PIZZA, DRINKS = (
     'Напитки'
 )
 
-BACK, ADD_TO_SHOPPING_CART, REMOVE_FROM_SHOPPING_CART = (
+BACK, ADD_TO_SHOPPING_CART, REMOVE_FROM_SHOPPING_CART, MY_SHOPPING_CART, MAKE_ORDER = (
     'Назад',
     'Добавить в корзину',
-    'Удалить'
+    'Удалить',
+    'Моя корзина',
+    'Оформить заказ'
     )
 
 INCREASE, DECREASE = (
@@ -28,10 +32,17 @@ INCREASE, DECREASE = (
 )
 
 KEYBOARD_NAVIGATION = [
-    [InlineKeyboardButton("Показать еще", callback_data=str(PIZZA))],
-    [InlineKeyboardButton("Моя корзина", callback_data=str(PIZZA))],
-    [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))],
+    # [InlineKeyboardButton("Показать еще", callback_data=str(PIZZA))],
+    [InlineKeyboardButton("Моя корзина", callback_data=str(MY_SHOPPING_CART))],
+    # [InlineKeyboardButton("Оформить заказ", callback_data=str(DRINKS))],
     [InlineKeyboardButton("Назад", callback_data=str(BACK))]
+]
+
+KEYBOARD_MY_SHOPPING_CART = [
+    [
+        InlineKeyboardButton("Оформить заказ", callback_data=str(MAKE_ORDER)),
+        InlineKeyboardButton("Назад", callback_data=str(BACK)),
+    ]
 ]
 
 KEYBOARD_MENU = [
@@ -54,9 +65,15 @@ KEYBOARD_SHOPPING_CART = [
 KEYBOARD_SET_PORTION = [
     [
         InlineKeyboardButton('▼', callback_data=str(DECREASE)),
-        InlineKeyboardButton('1', callback_data=str('1')), #Надо вставить переменную для указания количества добавленных порций.
+        InlineKeyboardButton(str(1), callback_data=str(1)), #Надо вставить переменную для указания количества добавленных порций.
         InlineKeyboardButton('▲', callback_data=str(INCREASE))
     ],
+    [
+        InlineKeyboardButton('Удалить', callback_data=str(REMOVE_FROM_SHOPPING_CART))
+    ]
+]
+
+KEYBOARD_REMOVE_FROM_SHOPPING_CART = [
     [
         InlineKeyboardButton('Удалить', callback_data=str(REMOVE_FROM_SHOPPING_CART))
     ]
@@ -112,3 +129,43 @@ def send_message(context, chat_id, menu, menu_type):
 def create_menu_list(context, menu_type):
     if not context.user_data.get(menu_type):
         context.user_data[menu_type] = []
+
+
+def edit_message_reply_markup(context, dish_count, message_id, chat_id):
+    context.bot.edit_message_reply_markup(
+        message_id=message_id,
+        chat_id=chat_id,
+        reply_markup = InlineKeyboardMarkup(
+            [[
+                InlineKeyboardButton('▼', callback_data=str(DECREASE)),
+                InlineKeyboardButton(str(dish_count), callback_data=str(dish_count)), #Надо вставить переменную для указания количества добавленных порций.
+                InlineKeyboardButton('▲', callback_data=str(INCREASE))
+            ],
+            [
+                InlineKeyboardButton('Удалить', callback_data=str(REMOVE_FROM_SHOPPING_CART))
+            ]]
+        )
+    )
+
+
+def show_my_shopping_cart(context, chat_id):
+    total_price = 0
+    for key, value in context.user_data.items():
+        if key in MENU:
+            for dish_dict in value:
+                dish = get_dish(key, next(iter(dish_dict.keys())))
+                dish_position_price =dish['price']*int(next(iter(dish_dict.values())))
+                total_price += dish_position_price
+                message_id = context.bot.send_message(
+                    chat_id=chat_id,
+                    text=f"Блюдо: {dish['name']}\nЦена: {dish['price']}\nКоличество порций: {next(iter(dish_dict.values()))}\nСтоимость: {dish_position_price}",
+                    reply_markup=InlineKeyboardMarkup(KEYBOARD_REMOVE_FROM_SHOPPING_CART)
+                )
+                save_message_id(context, message_id)
+    message_id = context.bot.send_message(
+        chat_id=chat_id,
+        text=f"К оплате: {total_price}",
+        reply_markup=InlineKeyboardMarkup(KEYBOARD_MY_SHOPPING_CART)
+    )
+    save_message_id(context, message_id)
+# считываем ключи из корзины чтобы достать их при помощи get_menu.
