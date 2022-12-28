@@ -6,17 +6,16 @@ from utils import (
     MENU,
     FIRST,
     KEYBOARD_MENU,
-    KEYBOARD_SHOPPING_CART,
-    KEYBOARD_MY_SHOPPING_CART,
     KEYBOARD_SET_PORTION,
     SECOND,
     THIRD,
     edit_message_reply_markup,
-    delete_message,
+    delete_message_all,
     save_message_id,
     send_message,
     create_menu_list,
-    show_my_shopping_cart
+    show_my_shopping_cart,
+    delete_dish
 )
 
 
@@ -36,7 +35,7 @@ def start_over(update, context):
     query = update.callback_query
     query.answer()
     chat_id = get_chat_id(db, update.effective_user)
-    delete_message(context, chat_id)
+    delete_message_all(context, chat_id)
     message_id = context.bot.send_message(
         chat_id=chat_id,
         text="Меню",
@@ -51,7 +50,7 @@ def hot_dishes(update, context):
     menu_type = 'hot_dishes'
     menu = get_menu(menu_type)
     create_menu_list(context, menu_type)
-    delete_message(context, chat_id)
+    delete_message_all(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
 
@@ -61,7 +60,7 @@ def soup(update, context):
     menu_type = 'soup'
     menu = get_menu(menu_type)
     create_menu_list(context, menu_type)
-    delete_message(context, chat_id)
+    delete_message_all(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
 
@@ -71,7 +70,7 @@ def pizza(update, context):
     menu_type = 'pizza'
     menu = get_menu(menu_type)
     create_menu_list(context, menu_type)
-    delete_message(context, chat_id)
+    delete_message_all(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
 
@@ -81,7 +80,7 @@ def drinks(update, context):
     menu_type = 'drinks'
     menu = get_menu(menu_type)
     create_menu_list(context, menu_type)
-    delete_message(context, chat_id)
+    delete_message_all(context, chat_id)
     send_message(context, chat_id, menu, menu_type)
     return SECOND
 
@@ -113,23 +112,14 @@ def add_to_shopping_cart(update, context):
     return SECOND
 
 
-def delete_from_shopping_cart(update, context):
+def delete_from_shopping_list(update, context):
+    '''Удаление блюда из меню'''
     query = update.callback_query
     query.answer()
-    chat_id = get_chat_id(db, update.effective_user)
     message_id = query['message']['message_id']
-    message = context.bot.edit_message_reply_markup(
-        message_id=message_id,
-        chat_id=chat_id,
-        reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART)
-    )
-    dish_type = message['text'].split()[-1].split('.')[0]
-    dish_id = message['text'].split()[-1].split('.')[-1]
-    for dish in context.user_data[dish_type]:
-        if dish.get(dish_id, False):
-            i = context.user_data[dish_type].index(dish)
-            context.user_data[dish_type].pop(i)
-            break
+    chat_id = get_chat_id(db, update.effective_user)
+    flag = 'menu'
+    delete_dish(context, chat_id, message_id, flag=flag)
     print(context.user_data)
     return SECOND
 
@@ -174,9 +164,21 @@ def my_shopping_cart(update, context):
     query = update.callback_query
     query.answer()
     chat_id = get_chat_id(db, update.effective_user)
-    delete_message(context, chat_id)
-    show_my_shopping_cart(context, chat_id)            
+    delete_message_all(context, chat_id)
+    show_my_shopping_cart(context, chat_id)    
     return THIRD
+
+
+def delete_from_shopping_cart(update, context):
+    '''Удаление блюд из корзины '''
+    query = update.callback_query
+    query.answer()
+    chat_id = get_chat_id(db, update.effective_user)
+    message_id = query['message']['message_id']
+    message = query['message']
+    delete_dish(context, chat_id, message_id, message)
+    return THIRD
+
 
 def end(update, _):
     """Возвращает `ConversationHandler.END`, который говорит 

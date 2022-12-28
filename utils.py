@@ -7,6 +7,8 @@ from telegram import (
 
 from db import get_menu, get_dish
 
+from glob import glob
+
 FIRST, SECOND, THIRD, FOURTH = range(4)
 
 MENU = ['hot_dishes', 'soup', 'pizza', 'drinks']
@@ -53,7 +55,8 @@ KEYBOARD_MENU = [
     [
         InlineKeyboardButton("Пицца", callback_data=str(PIZZA)),
         InlineKeyboardButton("Напитки", callback_data=str(DRINKS))
-    ]
+    ],
+    [InlineKeyboardButton("Моя корзина", callback_data=str(MY_SHOPPING_CART))]
 ]
 
 KEYBOARD_SHOPPING_CART = [
@@ -95,7 +98,14 @@ def save_message_id(context, message_id):
         context.user_data['message_ids'].append(message_id['message_id'])
 
 
-def delete_message(context, chat_id):
+def delete_message_one(context, chat_id, message_id):
+    context.bot.deleteMessage(
+            chat_id=chat_id,
+            message_id=message_id
+        )
+    context.user_data['message_ids'].remove(message_id)
+
+def delete_message_all(context, chat_id):
     for message_id in context.user_data['message_ids']:
         context.bot.deleteMessage(
             chat_id=chat_id,
@@ -106,6 +116,11 @@ def delete_message(context, chat_id):
 
 def send_message(context, chat_id, menu, menu_type):
     for item in menu:
+        message_id = context.bot.send_photo(
+            chat_id=chat_id,
+            photo=open(f"menu_imgs/{menu_type}/{item['id']}.png", 'rb'),
+        )
+        save_message_id(context, message_id)
         message_id = context.bot.send_message(
             chat_id=chat_id,
             text=f"""
@@ -154,12 +169,18 @@ def show_my_shopping_cart(context, chat_id):
         if key in MENU:
             for dish_dict in value:
                 dish = get_dish(key, next(iter(dish_dict.keys())))
-                dish_position_price =dish['price']*int(next(iter(dish_dict.values())))
+                dish_position_price = dish['price']*int(next(iter(dish_dict.values())))
                 total_price += dish_position_price
+                message_id = context.bot.send_photo(
+                    chat_id=chat_id,
+                    photo=open(f"menu_imgs/{key}/{dish['id']}.png", 'rb'),
+                )
+                save_message_id(context, message_id)
                 message_id = context.bot.send_message(
                     chat_id=chat_id,
-                    text=f"Блюдо: {dish['name']}\nЦена: {dish['price']}\nКоличество порций: {next(iter(dish_dict.values()))}\nСтоимость: {dish_position_price}",
-                    reply_markup=InlineKeyboardMarkup(KEYBOARD_REMOVE_FROM_SHOPPING_CART)
+                    text=f"Блюдо: {dish['name']}\nЦена: {dish['price']}\nКоличество порций: {next(iter(dish_dict.values()))}\nСтоимость: {dish_position_price}\n<span class='tg-spoiler'>ID: {key}.{dish['id']}</span>",
+                    reply_markup=InlineKeyboardMarkup(KEYBOARD_REMOVE_FROM_SHOPPING_CART),
+                    parse_mode = ParseMode.HTML
                 )
                 save_message_id(context, message_id)
     message_id = context.bot.send_message(
@@ -168,4 +189,36 @@ def show_my_shopping_cart(context, chat_id):
         reply_markup=InlineKeyboardMarkup(KEYBOARD_MY_SHOPPING_CART)
     )
     save_message_id(context, message_id)
-# считываем ключи из корзины чтобы достать их при помощи get_menu.
+    context.user_data['total_price'] = total_price
+
+
+def refresh_total_price(context, chat_id, message):
+    message_id = context.user_data['message_ids'][-1]
+    dish_price = message['text'].split('\n')[3].split()[-1]
+    total_price = context.user_data['total_price']
+    refreshed_price = total_price - int(dish_price)
+    context.user_data['total_price'] = refreshed_price
+    context.bot.edit_message_text(
+        message_id=message_id,
+        chat_id=chat_id,
+        text=f'К оплате: {refreshed_price}',
+        reply_markup=InlineKeyboardMarkup(KEYBOARD_MY_SHOPPING_CART)
+    )
+
+def delete_dish(context, chat_id, message_id, message=0, flag=0):
+    if flag == 'menu':
+        message = context.bot.edit_message_reply_markup(
+            message_id=message_id,
+            chat_id=chat_id,
+            reply_markup=InlineKeyboardMarkup(KEYBOARD_SHOPPING_CART)
+        )
+    else:
+        delete_message_one(context, chat_id,  message_id)
+        refresh_total_price(context, chat_id, message)
+    dish_type = message['text'].split()[-1].split('.')[0]
+    dish_id = message['text'].split()[-1].split('.')[-1]
+    for dish in context.user_data[dish_type]:
+        if dish.get(dish_id, False):
+            context.user_data[dish_type].remove(dish)
+            break
+    print(context.user_data)
