@@ -95,8 +95,8 @@ def add_to_shopping_cart(update, context):
         chat_id=chat_id,
         reply_markup=InlineKeyboardMarkup(KEYBOARD_SET_PORTION)
     )
-    dish_type = message['text'].split()[-1].split('.')[0]
-    dish_id = message['text'].split()[-1].split('.')[-1]
+    dish_type = message['caption'].split()[-1].split('.')[0]
+    dish_id = message['caption'].split()[-1].split('.')[-1]
     order[dish_id] = 1
 
     if not context.user_data[dish_type]:
@@ -129,7 +129,7 @@ def increase_dish(update, context):
     query.answer()
     chat_id = get_chat_id(db, update.effective_user)
     message_id = query['message']['message_id']
-    dish = query['message']['text'].split()[-1]
+    dish = query['message']['caption'].split()[-1]
     dish_id = dish.split('.')[-1]
     dish_type = dish.split('.')[0]
     for dish in context.user_data[dish_type]:
@@ -147,7 +147,7 @@ def decrease_dish(update, context):
     query.answer()
     chat_id = get_chat_id(db, update.effective_user)
     message_id = query['message']['message_id']
-    dish = query['message']['text'].split()[-1]
+    dish = query['message']['caption'].split()[-1]
     dish_id = dish.split('.')[-1]
     dish_type = dish.split('.')[0]
     for dish in context.user_data[dish_type]:

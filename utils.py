@@ -119,11 +119,7 @@ def send_message(context, chat_id, menu, menu_type):
         message_id = context.bot.send_photo(
             chat_id=chat_id,
             photo=open(f"menu_imgs/{menu_type}/{item['id']}.png", 'rb'),
-        )
-        save_message_id(context, message_id)
-        message_id = context.bot.send_message(
-            chat_id=chat_id,
-            text=f"""
+            caption=f"""
             Название: {item['name']}
 Цена: {item['price']}
 Описание: {item['description']}
@@ -174,11 +170,7 @@ def show_my_shopping_cart(context, chat_id):
                 message_id = context.bot.send_photo(
                     chat_id=chat_id,
                     photo=open(f"menu_imgs/{key}/{dish['id']}.png", 'rb'),
-                )
-                save_message_id(context, message_id)
-                message_id = context.bot.send_message(
-                    chat_id=chat_id,
-                    text=f"Блюдо: {dish['name']}\nЦена: {dish['price']}\nКоличество порций: {next(iter(dish_dict.values()))}\nСтоимость: {dish_position_price}\n<span class='tg-spoiler'>ID: {key}.{dish['id']}</span>",
+                    caption=f"Блюдо: {dish['name']}\nЦена: {dish['price']}\nКоличество порций: {next(iter(dish_dict.values()))}\nСтоимость: {dish_position_price}\n<span class='tg-spoiler'>ID: {key}.{dish['id']}</span>",
                     reply_markup=InlineKeyboardMarkup(KEYBOARD_REMOVE_FROM_SHOPPING_CART),
                     parse_mode = ParseMode.HTML
                 )
@@ -194,7 +186,7 @@ def show_my_shopping_cart(context, chat_id):
 
 def refresh_total_price(context, chat_id, message):
     message_id = context.user_data['message_ids'][-1]
-    dish_price = message['text'].split('\n')[3].split()[-1]
+    dish_price = message['caption'].split('\n')[3].split()[-1]
     total_price = context.user_data['total_price']
     refreshed_price = total_price - int(dish_price)
     context.user_data['total_price'] = refreshed_price
@@ -215,8 +207,9 @@ def delete_dish(context, chat_id, message_id, message=0, flag=0):
     else:
         delete_message_one(context, chat_id,  message_id)
         refresh_total_price(context, chat_id, message)
-    dish_type = message['text'].split()[-1].split('.')[0]
-    dish_id = message['text'].split()[-1].split('.')[-1]
+    print(message['caption'])
+    dish_type = message['caption'].split()[-1].split('.')[0]
+    dish_id = message['caption'].split()[-1].split('.')[-1]
     for dish in context.user_data[dish_type]:
         if dish.get(dish_id, False):
             context.user_data[dish_type].remove(dish)
